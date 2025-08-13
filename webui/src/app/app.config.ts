@@ -1,7 +1,7 @@
 import { ApplicationConfig, InjectionToken } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideZoneChangeDetection } from '@angular/core';
 
-import { routes } from './app.routes';
 import { BlueskyService } from './services/interfaces/bluesky-service.interface';
 import { InstagramService } from './services/interfaces/instagram-service.interface';
 import { ProgressService } from './services/interfaces/progress-service.interface';
@@ -16,7 +16,8 @@ export const PROGRESS_SERVICE = new InjectionToken<ProgressService>('ProgressSer
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    // provideRouter(routes), // Temporarily disabled for build
+    provideAnimations(),
+    provideZoneChangeDetection(),
     {
       provide: BLUESKY_SERVICE,
       useClass: BlueskyServiceMVP

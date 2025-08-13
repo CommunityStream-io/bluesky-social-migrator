@@ -1,12 +1,12 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { MigrationStepperComponent } from './components/migration-stepper/migration-stepper.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  standalone: true,
+  imports: [MigrationStepperComponent],
+  template: '<app-migration-stepper></app-migration-stepper>'
 })
 export class App {
-  protected readonly title = signal('webui');
+  protected readonly title = 'Bluesky Social Migrator';
 }
