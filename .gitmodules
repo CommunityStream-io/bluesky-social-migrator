@@ -1,0 +1,3 @@
+[submodule "instagram-to-bluesky"]
+	path = instagram-to-bluesky
+	url = https://github.com/marcomaroni-github/instagram-to-bluesky
