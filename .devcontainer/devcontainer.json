@@ -3,5 +3,15 @@
 	"features": {
 		"ghcr.io/devcontainers-extra/features/angular-cli:2": {}
 	},
-	"postStartCommand": "git submodule update --init --recursive"
+	"postStartCommand": "git submodule update --init --recursive && cd webui/ && npm install",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"angular.ng-template",
+				"esbenp.prettier-vscode",
+				"ms-vscode.vscode-typescript-tslint-plugin",
+				"ms-vscode.vscode-typescript-next"
+			]
+		}
+	}
 }
