@@ -9,8 +9,7 @@
 			"extensions": [
 				"angular.ng-template",
 				"esbenp.prettier-vscode",
-				"ms-vscode.vscode-typescript-tslint-plugin",
-				"ms-vscode.vscode-typescript-next"
+				"manishgowardipe.test-runner"
 			]
 		}
 	}
