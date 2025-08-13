@@ -1,0 +1,28 @@
+{
+  "name": "bluesky-social-migrator",
+  "version": "1.0.0",
+  "description": "Web app for migrating instragram to bsky without being technical",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CommunityStream-io/bluesky-social-migrator.git"
+  },
+  "keywords": [
+    "bluesky",
+    "instagram",
+    "migration",
+    "webapp"
+  ],
+  "author": "Triforce",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CommunityStream-io/bluesky-social-migrator/issues"
+  },
+  "homepage": "https://github.com/CommunityStream-io/bluesky-social-migrator#readme",
+  "dependencies": {
+    "@angular/cli": "^20.1.5"
+  }
+}
