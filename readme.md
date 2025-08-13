@@ -12,10 +12,23 @@ Huge shoutout to the Instragram to Bluesky maintainors that allows this project 
 bluesky-social-migrator/
 ├── .git/                          # Git repository
 ├── .gitignore                     # Git ignore rules
+├── .gitmodules                    # Git submodules configuration
 ├── package.json                   # Root package configuration
 ├── package-lock.json             # Dependency lock file
 ├── node_modules/                  # Root dependencies
 ├── readme.md                      # This file
+├── instagram-to-bluesky/          # Instagram to Bluesky submodule (v0.7.5)
+│   ├── .git/                      # Submodule git reference
+│   ├── .github/                   # GitHub workflows and templates
+│   ├── .vscode/                   # VS Code configuration
+│   ├── src/                       # Source code for migration logic
+│   ├── transfer/                   # Transfer functionality
+│   ├── package.json               # Submodule dependencies
+│   ├── tsconfig.json              # TypeScript configuration
+│   ├── jest.config.ts             # Testing configuration
+│   ├── eslint.config.ts           # Linting configuration
+│   ├── README.md                  # Submodule documentation
+│   └── LICENSE.txt                # Submodule license
 └── webui/                         # Angular web application
     ├── .vscode/                   # VS Code configuration
     ├── .editorconfig              # Editor configuration
@@ -49,7 +62,7 @@ bluesky-social-migrator/
 
 ## Getting started
 
-Init the submodule instagram to bluesky
+Initialize the Instagram to Bluesky submodule:
 
 ```
 git submodule --init --recursive
