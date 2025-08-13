@@ -1,0 +1,209 @@
+<div class="migration-config-container">
+  <mat-card class="config-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>settings</mat-icon>
+        Migration Configuration
+      </mat-card-title>
+      <mat-card-subtitle>
+        Configure your migration settings and preview what will be migrated
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Configuration Summary -->
+      <div class="config-summary" *ngIf="getTotalPostCount() > 0">
+        <h4><mat-icon>info</mat-icon> Migration Summary</h4>
+        <div class="summary-grid">
+          <div class="summary-item" *ngFor="let item of getConfigurationSummary()">
+            <span class="label">{{ item.label }}:</span>
+            <span class="value">{{ item.value }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuration Form -->
+      <form [formGroup]="configForm" (ngSubmit)="onSubmit()" class="config-form">
+        <div class="form-section">
+          <h4><mat-icon>content_copy</mat-icon> Content Options</h4>
+          
+          <div class="form-row">
+            <mat-checkbox formControlName="includeLikes" class="full-width">
+              Include post likes and engagement data
+            </mat-checkbox>
+          </div>
+          
+          <div class="form-row">
+            <mat-checkbox formControlName="includeComments" class="full-width">
+              Include post comments
+            </mat-checkbox>
+          </div>
+          
+          <div class="form-row">
+            <mat-checkbox formControlName="preserveOriginalDates" class="full-width">
+              Preserve original post dates
+            </mat-checkbox>
+          </div>
+          
+          <div class="form-row">
+            <mat-checkbox formControlName="excludePrivatePosts" class="full-width">
+              Exclude private posts
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4><mat-icon>date_range</mat-icon> Date Range</h4>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>End Date</mat-label>
+              <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+          
+          <div class="date-warning" *ngIf="!validateDateRange()">
+            <mat-icon color="warn">warning</mat-icon>
+            <span>End date must be after start date</span>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4><mat-icon>image</mat-icon> Media Settings</h4>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Media Quality</mat-label>
+              <mat-select formControlName="mediaQuality">
+                <mat-option *ngFor="let option of getMediaQualityOptions()" [value]="option.value">
+                  <div class="option-content">
+                    <span class="option-label">{{ option.label }}</span>
+                    <span class="option-description">{{ option.description }}</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-checkbox formControlName="addWatermark" class="full-width">
+              Add watermark to migrated images
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4><mat-icon>speed</mat-icon> Performance Settings</h4>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Batch Size</mat-label>
+              <mat-select formControlName="batchSize">
+                <mat-option *ngFor="let size of getBatchSizeOptions()" [value]="size">
+                  {{ size }} posts per batch
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Advanced Options -->
+        <div class="form-section">
+          <button type="button" 
+                  mat-button 
+                  (click)="toggleAdvancedOptions()"
+                  class="advanced-toggle">
+            <mat-icon>{{ showAdvancedOptions ? 'expand_less' : 'expand_more' }}</mat-icon>
+            {{ showAdvancedOptions ? 'Hide' : 'Show' }} Advanced Options
+          </button>
+          
+          <div class="advanced-options" *ngIf="showAdvancedOptions">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Custom Hashtags</mat-label>
+                <input matInput formControlName="customHashtags" placeholder="#migrated #instagram">
+                <mat-hint>Add custom hashtags to all migrated posts</mat-hint>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" 
+                  mat-button 
+                  (click)="resetToDefaults()"
+                  [disabled]="isProcessing">
+            Reset to Defaults
+          </button>
+          
+          <button type="submit" 
+                  mat-raised-button 
+                  color="primary"
+                  [disabled]="configForm.invalid || isProcessing || !validateDateRange()">
+            <mat-icon *ngIf="!isProcessing">save</mat-icon>
+            <mat-spinner *ngIf="isProcessing" diameter="20"></mat-spinner>
+            {{ isProcessing ? 'Saving...' : 'Save Configuration' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Post Preview -->
+      <div class="post-preview" *ngIf="getFilteredPosts().length > 0">
+        <h4><mat-icon>preview</mat-icon> Post Preview</h4>
+        
+        <div class="preview-stats">
+          <div class="stat-item">
+            <mat-icon>article</mat-icon>
+            <span>{{ getTotalPostCount() }} posts selected</span>
+          </div>
+          <div class="stat-item">
+            <mat-icon>image</mat-icon>
+            <span>{{ getTotalMediaCount() }} media files</span>
+          </div>
+          <div class="stat-item">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ estimatedTime || 'Calculating...' }}</span>
+          </div>
+        </div>
+        
+        <div class="posts-grid">
+          <div class="post-card" *ngFor="let post of getFilteredPosts().slice(0, 6)">
+            <div class="post-header">
+              <span class="post-date">{{ post.timestamp | date:'short' }}</span>
+              <span class="post-stats">
+                <mat-icon>thumb_up</mat-icon>{{ post.likes }}
+                <mat-icon>comment</mat-icon>{{ post.comments }}
+              </span>
+            </div>
+            <div class="post-content">
+              <p class="post-caption">{{ post.caption | slice:0:100 }}{{ post.caption.length > 100 ? '...' : '' }}</p>
+            </div>
+            <div class="post-media">
+              <span class="media-count">{{ post.media.length }} media</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="preview-footer" *ngIf="getFilteredPosts().length > 6">
+          <p>Showing 6 of {{ getFilteredPosts().length }} posts</p>
+        </div>
+      </div>
+
+      <!-- Success Message -->
+      <div class="success-message" *ngIf="isStepCompleted">
+        <mat-icon color="success">check_circle</mat-icon>
+        <h5>Configuration saved successfully! You can now proceed to execute the migration.</h5>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

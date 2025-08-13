@@ -1,0 +1,180 @@
+<div class="completion-container">
+  <mat-card class="completion-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>celebration</mat-icon>
+        Migration Complete!
+      </mat-card-title>
+      <mat-card-subtitle>
+        Your Instagram to Bluesky migration has been completed successfully
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Success Message -->
+      <div class="success-banner" [ngClass]="getCompletionColor()">
+        <mat-icon>check_circle</mat-icon>
+        <div class="success-content">
+          <h3>{{ getCompletionMessage() }}</h3>
+          <p>Congratulations! Your content has been successfully migrated to Bluesky.</p>
+        </div>
+      </div>
+
+      <!-- Migration Statistics -->
+      <div class="stats-section" *ngIf="migrationStats">
+        <h4><mat-icon>analytics</mat-icon> Migration Statistics</h4>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <mat-icon>article</mat-icon>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ migrationStats.totalPosts }}</span>
+              <span class="stat-label">Posts Migrated</span>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <mat-icon>image</mat-icon>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ migrationStats.totalMedia }}</span>
+              <span class="stat-label">Media Files</span>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <mat-icon>speed</mat-icon>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ getProcessingSpeed() }}</span>
+              <span class="stat-label">Processing Speed</span>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <mat-icon>schedule</mat-icon>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ getMigrationDuration() }}</span>
+              <span class="stat-label">Total Duration</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quality Assessment -->
+      <div class="quality-section" *ngIf="migrationStats">
+        <h4><mat-icon>star</mat-icon> Migration Quality</h4>
+        
+        <div class="quality-content">
+          <div class="quality-rating">
+            <div class="stars">
+              <mat-icon *ngFor="let star of [1,2,3,4,5]" 
+                        [ngClass]="star <= getQualityRating() ? 'star-filled' : 'star-empty'">
+                {{ star <= getQualityRating() ? 'star' : 'star_border' }}
+              </mat-icon>
+            </div>
+            <span class="rating-text">{{ getQualityDescription() }}</span>
+          </div>
+          
+          <div class="success-rate">
+            <span class="rate-label">Success Rate:</span>
+            <span class="rate-value" [ngClass]="getSuccessRateColor()">
+              {{ getSuccessRate() }}%
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Results -->
+      <div class="detailed-results">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon>details</mat-icon>
+              Detailed Migration Results
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          
+          <div class="results-content" *ngIf="migrationResults">
+            <div class="result-item">
+              <span class="label">Completed Posts:</span>
+              <span class="value">{{ migrationResults.completedPosts || 0 }}</span>
+            </div>
+            <div class="result-item">
+              <span class="label">Completed Media:</span>
+              <span class="value">{{ migrationResults.completedMedia || 0 }}</span>
+            </div>
+            <div class="result-item">
+              <span class="label">Total Logs:</span>
+              <span class="value">{{ migrationResults.migrationLogs?.length || 0 }}</span>
+            </div>
+            <div class="result-item">
+              <span class="label">Data Size:</span>
+              <span class="value">{{ migrationStats?.dataSize || 'Unknown' }}</span>
+            </div>
+            
+            <mat-divider></mat-divider>
+            
+            <div class="logs-preview" *ngIf="migrationResults.migrationLogs?.length > 0">
+              <h5>Recent Migration Logs</h5>
+              <div class="log-entries">
+                <div class="log-entry" *ngFor="let log of migrationResults.migrationLogs.slice(0, 5)">
+                  {{ log }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </div>
+
+      <!-- Next Steps -->
+      <div class="next-steps">
+        <h4><mat-icon>next_plan</mat-icon> What's Next?</h4>
+        
+        <mat-list>
+          <mat-list-item *ngFor="let step of nextSteps; let i = index">
+            <mat-icon matListItemIcon color="primary">{{ i + 1 }}</mat-icon>
+            <div matListItemTitle>{{ step }}</div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button mat-raised-button 
+                color="primary" 
+                (click)="exportResults()"
+                class="action-button">
+          <mat-icon>download</mat-icon>
+          Export Results
+        </button>
+        
+        <button mat-button 
+                color="accent" 
+                (click)="startNewMigration()"
+                class="action-button">
+          <mat-icon>refresh</mat-icon>
+          Start New Migration
+        </button>
+      </div>
+
+      <!-- Completion Footer -->
+      <div class="completion-footer">
+        <mat-divider></mat-divider>
+        <div class="footer-content">
+          <p>Thank you for using Instagram to Bluesky Migrator!</p>
+          <p class="footer-note">
+            Your migration data has been saved and can be exported for future reference.
+            If you encounter any issues with your migrated content, please refer to the export file.
+          </p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

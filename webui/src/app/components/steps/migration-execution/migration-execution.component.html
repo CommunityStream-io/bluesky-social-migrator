@@ -1,0 +1,198 @@
+<div class="migration-execution-container">
+  <mat-card class="execution-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>sync</mat-icon>
+        Migration Execution
+      </mat-card-title>
+      <mat-card-subtitle>
+        Monitor and control the migration process in real-time
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Migration Status -->
+      <div class="migration-status" [ngClass]="getStatusColor()">
+        <mat-icon>{{ isMigrationRunning ? 'sync' : 'play_circle' }}</mat-icon>
+        <div class="status-content">
+          <h4>{{ getStatusMessage() }}</h4>
+          <p *ngIf="currentProgress">{{ getCurrentPostInfo() }}</p>
+        </div>
+      </div>
+
+      <!-- Progress Overview -->
+      <div class="progress-overview" *ngIf="currentProgress">
+        <div class="progress-section">
+          <h5>Overall Progress</h5>
+          <mat-progress-bar mode="determinate" [value]="getOverallProgress()"></mat-progress-bar>
+          <div class="progress-stats">
+            <span>{{ currentProgress.currentPost }} / {{ currentProgress.totalPosts }} posts</span>
+            <span>{{ getOverallProgress() | number:'1.0-0' }}%</span>
+          </div>
+        </div>
+
+        <div class="progress-section">
+          <h5>Media Progress</h5>
+          <mat-progress-bar mode="determinate" [value]="getMediaProgress()"></mat-progress-bar>
+          <div class="progress-stats">
+            <span>{{ currentProgress.currentMedia }} / {{ currentProgress.totalMedia }} media</span>
+            <span>{{ getMediaProgress() | number:'1.0-0' }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Migration Controls -->
+      <div class="migration-controls">
+        <div class="control-buttons">
+          <button mat-raised-button 
+                  color="primary" 
+                  (click)="startMigration()"
+                  [disabled]="isMigrationRunning || processedPosts.length === 0"
+                  class="control-button">
+            <mat-icon>play_arrow</mat-icon>
+            Start Migration
+          </button>
+
+          <button mat-button 
+                  color="accent" 
+                  (click)="pauseMigration()"
+                  [disabled]="!isMigrationRunning || isMigrationPaused"
+                  class="control-button">
+            <mat-icon>pause</mat-icon>
+            Pause
+          </button>
+
+          <button mat-button 
+                  color="accent" 
+                  (click)="resumeMigration()"
+                  [disabled]="!isMigrationPaused"
+                  class="control-button">
+            <mat-icon>play_arrow</mat-icon>
+            Resume
+          </button>
+
+          <button mat-button 
+                  color="warn" 
+                  (click)="cancelMigration()"
+                  [disabled]="!isMigrationRunning"
+                  class="control-button">
+            <mat-icon>stop</mat-icon>
+            Cancel
+          </button>
+        </div>
+
+        <div class="migration-info" *ngIf="currentProgress">
+          <div class="info-item">
+            <mat-icon>schedule</mat-icon>
+            <span>Time Remaining: {{ getTimeRemaining() }}</span>
+          </div>
+          <div class="info-item">
+            <mat-icon>speed</mat-icon>
+            <span>Speed: {{ getMigrationSpeed() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Migration Summary -->
+      <div class="migration-summary" *ngIf="currentProgress">
+        <h4><mat-icon>assessment</mat-icon> Migration Summary</h4>
+        
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="label">Total Posts:</span>
+            <span class="value">{{ currentProgress.totalPosts }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Completed Posts:</span>
+            <span class="value">{{ currentProgress.currentPost }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Total Media:</span>
+            <span class="value">{{ currentProgress.totalMedia }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Completed Media:</span>
+            <span class="value">{{ currentProgress.currentMedia }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Status:</span>
+            <span class="value status-chip" [ngClass]="currentProgress.status">
+              {{ currentProgress.status }}
+            </span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Estimated Time:</span>
+            <span class="value">{{ getTimeRemaining() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Migration Logs -->
+      <div class="migration-logs">
+        <div class="logs-header">
+          <h4><mat-icon>list</mat-icon> Migration Logs</h4>
+          <div class="logs-actions">
+            <button mat-button 
+                    (click)="toggleDetailedLogs()"
+                    class="toggle-button">
+              <mat-icon>{{ showDetailedLogs ? 'expand_less' : 'expand_more' }}</mat-icon>
+              {{ showDetailedLogs ? 'Hide' : 'Show' }} Details
+            </button>
+            <button mat-button 
+                    (click)="clearLogs()"
+                    [disabled]="migrationLogs.length === 0"
+                    class="clear-button">
+              <mat-icon>clear_all</mat-icon>
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="logs-content" *ngIf="showDetailedLogs">
+          <div class="log-entries">
+            <div class="log-entry" *ngFor="let log of migrationLogs.slice(0, 20)">
+              <span class="log-message">{{ log }}</span>
+            </div>
+          </div>
+          
+          <div class="logs-footer" *ngIf="migrationLogs.length > 20">
+            <p>Showing last 20 of {{ migrationLogs.length }} log entries</p>
+          </div>
+        </div>
+
+        <div class="logs-preview" *ngIf="!showDetailedLogs && migrationLogs.length > 0">
+          <p class="preview-text">{{ migrationLogs[0] }}</p>
+          <p class="preview-hint">Click "Show Details" to view all logs</p>
+        </div>
+      </div>
+
+      <!-- Error Display -->
+      <div class="error-section" *ngIf="errors.length > 0">
+        <h5><mat-icon color="error">error</mat-icon> Migration Errors</h5>
+        <mat-list>
+          <mat-list-item *ngFor="let error of errors">
+            <mat-icon matListItemIcon color="error">error</mat-icon>
+            <div matListItemTitle>{{ error }}</div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <!-- Warning Display -->
+      <div class="warning-section" *ngIf="warnings.length > 0">
+        <h5><mat-icon color="warning">warning</mat-icon> Migration Warnings</h5>
+        <mat-list>
+          <mat-list-item *ngFor="let warning of warnings">
+            <mat-icon matListItemIcon color="warning">warning</mat-icon>
+            <div matListItemTitle>{{ warning }}</div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <!-- Success Message -->
+      <div class="success-message" *ngIf="isStepCompleted">
+        <mat-icon color="success">check_circle</mat-icon>
+        <h5>Migration completed successfully! You can now proceed to review the results.</h5>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

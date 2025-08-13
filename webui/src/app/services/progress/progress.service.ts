@@ -69,7 +69,7 @@ export class ProgressServiceMVP implements ProgressService {
       currentPost: 0,
       totalPosts: 0,
       currentMedia: 0,
-      totalMedia,
+      totalMedia: 0,
       status: 'idle',
       estimatedTimeRemaining: '0m'
     });

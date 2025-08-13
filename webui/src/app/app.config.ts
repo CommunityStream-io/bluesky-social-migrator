@@ -1,6 +1,5 @@
 import { ApplicationConfig, InjectionToken } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { routes } from './app.routes';
 import { BlueskyService } from './services/interfaces/bluesky-service.interface';
@@ -17,8 +16,7 @@ export const PROGRESS_SERVICE = new InjectionToken<ProgressService>('ProgressSer
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
-    provideAnimations(),
+    // provideRouter(routes), // Temporarily disabled for build
     {
       provide: BLUESKY_SERVICE,
       useClass: BlueskyServiceMVP

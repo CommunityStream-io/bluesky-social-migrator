@@ -1,0 +1,122 @@
+<div class="content-upload-container">
+  <mat-card class="upload-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>cloud_upload</mat-icon>
+        Upload Instagram Export Data
+      </mat-card-title>
+      <mat-card-subtitle>
+        Upload your Instagram export files to begin the migration process
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- File Upload Area -->
+      <div class="upload-area" 
+           (drop)="onFileDrop($event)" 
+           (dragover)="onDragOver($event)"
+           [class.drag-over]="false">
+        
+        <div class="upload-content" *ngIf="selectedFiles.length === 0">
+          <mat-icon class="upload-icon">cloud_upload</mat-icon>
+          <h3>Drag & Drop Files Here</h3>
+          <p>or</p>
+          <button mat-raised-button color="primary" (click)="fileInput.click()">
+            Choose Files
+          </button>
+          <input #fileInput type="file" 
+                 multiple 
+                 accept=".json,.zip,.html,.txt"
+                 (change)="onFileSelected($event)"
+                 style="display: none;">
+        </div>
+
+        <!-- Selected Files Display -->
+        <div class="selected-files" *ngIf="selectedFiles.length > 0">
+          <h4>Selected Files ({{ selectedFiles.length }})</h4>
+          
+          <mat-list>
+            <mat-list-item *ngFor="let file of selectedFiles; let i = index">
+              <mat-icon matListItemIcon>description</mat-icon>
+              <div matListItemTitle>{{ file.name }}</div>
+              <div matListItemLine>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</div>
+              <button mat-icon-button color="warn" (click)="removeFile(i)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-list-item>
+          </mat-list>
+
+          <div class="file-summary">
+            <p><strong>Total Size:</strong> {{ getTotalFileSize() }}</p>
+            <div class="file-types">
+              <span class="file-type-chip" *ngFor="let type of getFileTypeCounts() | keyvalue">
+                {{ type.key }}: {{ type.value }}
+              </span>
+            </div>
+          </div>
+
+          <div class="upload-actions">
+            <button mat-button (click)="clearFiles()">Clear All</button>
+            <button mat-raised-button 
+                    color="primary" 
+                    (click)="validateFiles()"
+                    [disabled]="isProcessing">
+              {{ isProcessing ? 'Processing...' : 'Validate Files' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Progress -->
+      <div class="progress-section" *ngIf="isProcessing">
+        <h4>Processing Files...</h4>
+        <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
+        <p>{{ uploadProgress }}% Complete</p>
+      </div>
+
+      <!-- Validation Results -->
+      <div class="validation-results" *ngIf="validationResult">
+        <h4>Validation Results</h4>
+        
+        <div class="validation-summary">
+          <div class="summary-item">
+            <mat-icon color="primary">check_circle</mat-icon>
+            <span>{{ validationResult.posts.length }} Posts Found</span>
+          </div>
+          <div class="summary-item">
+            <mat-icon color="primary">image</mat-icon>
+            <span>{{ validationResult.media.length }} Media Files</span>
+          </div>
+        </div>
+
+        <!-- Warnings -->
+        <div class="warnings" *ngIf="warnings.length > 0">
+          <h5><mat-icon color="warning">warning</mat-icon> Warnings</h5>
+          <mat-list>
+            <mat-list-item *ngFor="let warning of warnings">
+              <mat-icon matListItemIcon color="warning">info</mat-icon>
+              <div matListItemTitle>{{ warning }}</div>
+            </mat-list-item>
+          </mat-list>
+        </div>
+
+        <!-- Errors -->
+        <div class="errors" *ngIf="errors.length > 0">
+          <h5><mat-icon color="error">error</mat-icon> Errors</h5>
+          <mat-list>
+            <mat-list-item *ngFor="let error of errors">
+              <mat-icon matListItemIcon color="error">error</mat-icon>
+              <div matListItemTitle>{{ error }}</div>
+            </mat-list-item>
+          </mat-list>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-message" *ngIf="isStepCompleted && errors.length === 0">
+          <mat-icon color="success">check_circle</mat-icon>
+          <h5>Files validated successfully! You can now proceed to the next step.</h5>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

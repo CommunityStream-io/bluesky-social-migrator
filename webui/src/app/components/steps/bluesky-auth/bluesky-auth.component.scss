@@ -1,0 +1,233 @@
+.bluesky-auth-container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.auth-card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  
+  mat-card-header {
+    margin-bottom: 24px;
+    
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 500;
+      
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+    
+    mat-card-subtitle {
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.6);
+      margin-top: 8px;
+    }
+  }
+}
+
+.auth-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-weight: 500;
+  
+  &.primary {
+    background: #e3f2fd;
+    color: #1976d2;
+    border-left: 4px solid #1976d2;
+  }
+  
+  &.accent {
+    background: #fff3e0;
+    color: #f57c00;
+    border-left: 4px solid #f57c00;
+  }
+  
+  &.warn {
+    background: #fff3e0;
+    color: #f57c00;
+    border-left: 4px solid #f57c00;
+  }
+  
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  .remember-checkbox {
+    margin-top: 8px;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+    
+    .submit-button {
+      padding: 12px 32px;
+      font-size: 16px;
+      min-width: 160px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+.account-info {
+  margin-top: 24px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+  
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    
+    mat-icon {
+      color: #4caf50;
+    }
+  }
+  
+  .info-grid {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 20px;
+    
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #e0e0e0;
+      
+      .label {
+        font-weight: 500;
+        color: #666;
+        min-width: 120px;
+      }
+      
+      .value {
+        font-weight: 600;
+        color: #333;
+        text-align: right;
+      }
+    }
+  }
+  
+  .account-actions {
+    display: flex;
+    justify-content: flex-end;
+    
+    button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+.error-section {
+  margin-top: 24px;
+  padding: 20px;
+  background: #ffebee;
+  border-radius: 8px;
+  border-left: 4px solid #f44336;
+  
+  h5 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #c62828;
+    
+    mat-icon {
+      color: #f44336;
+    }
+  }
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #e8f5e8;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+  margin-top: 24px;
+  
+  mat-icon {
+    color: #4caf50;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+  
+  h5 {
+    margin: 0;
+    color: #2e7d32;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .bluesky-auth-container {
+    padding: 16px;
+  }
+  
+  .auth-form .form-actions .submit-button {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .info-grid .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    
+    .label {
+      min-width: auto;
+    }
+    
+    .value {
+      text-align: left;
+    }
+  }
+}

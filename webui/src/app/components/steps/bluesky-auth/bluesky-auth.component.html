@@ -1,0 +1,116 @@
+<div class="bluesky-auth-container">
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>account_circle</mat-icon>
+        Bluesky Authentication
+      </mat-card-title>
+      <mat-card-subtitle>
+        Sign in to your Bluesky account to continue with the migration
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Authentication Status -->
+      <div class="auth-status" [ngClass]="getAuthStatusColor()">
+        <mat-icon>{{ isAuthenticated ? 'check_circle' : 'info' }}</mat-icon>
+        <span>{{ getAuthStatusMessage() }}</span>
+      </div>
+
+      <!-- Login Form -->
+      <form [formGroup]="authForm" (ngSubmit)="onSubmit()" *ngIf="!isAuthenticated" class="auth-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput 
+                 formControlName="username" 
+                 placeholder="your.username"
+                 [errorStateMatcher]="matcher">
+          <mat-error>{{ getUsernameErrorMessage() }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput 
+                 [type]="showPassword ? 'text' : 'password'"
+                 formControlName="password" 
+                 placeholder="Enter your password"
+                 [errorStateMatcher]="matcher">
+          <button mat-icon-button 
+                  matSuffix 
+                  type="button"
+                  (click)="togglePasswordVisibility()">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
+        </mat-form-field>
+
+        <mat-checkbox formControlName="rememberCredentials" class="remember-checkbox">
+          Remember my credentials for this session
+        </mat-checkbox>
+
+        <div class="form-actions">
+          <button mat-raised-button 
+                  color="primary" 
+                  type="submit"
+                  [disabled]="authForm.invalid || isAuthenticating"
+                  class="submit-button">
+            <mat-icon *ngIf="!isAuthenticating">login</mat-icon>
+            <mat-spinner *ngIf="isAuthenticating" diameter="20"></mat-spinner>
+            {{ isAuthenticating ? 'Authenticating...' : 'Sign In' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Account Information -->
+      <div class="account-info" *ngIf="isAuthenticated && accountInfo">
+        <h4><mat-icon>account_circle</mat-icon> Account Information</h4>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Username:</span>
+            <span class="value">{{ accountInfo.username }}</span>
+          </div>
+          
+          <div class="info-item" *ngIf="accountInfo.displayName">
+            <span class="label">Display Name:</span>
+            <span class="value">{{ accountInfo.displayName }}</span>
+          </div>
+          
+          <div class="info-item" *ngIf="accountInfo.email">
+            <span class="label">Email:</span>
+            <span class="value">{{ accountInfo.email }}</span>
+          </div>
+          
+          <div class="info-item" *ngIf="accountInfo.handle">
+            <span class="label">Handle:</span>
+            <span class="value">{{ accountInfo.handle }}</span>
+          </div>
+        </div>
+
+        <div class="account-actions">
+          <button mat-button color="warn" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            Sign Out
+          </button>
+        </div>
+      </div>
+
+      <!-- Error Display -->
+      <div class="error-section" *ngIf="errors.length > 0">
+        <h5><mat-icon color="error">error</mat-icon> Authentication Errors</h5>
+        <mat-list>
+          <mat-list-item *ngFor="let error of errors">
+            <mat-icon matListItemIcon color="error">error</mat-icon>
+            <div matListItemTitle>{{ error }}</div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <!-- Success Message -->
+      <div class="success-message" *ngIf="isStepCompleted && isAuthenticated">
+        <mat-icon color="success">check_circle</mat-icon>
+        <h5>Authentication successful! You can now proceed to configure your migration.</h5>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

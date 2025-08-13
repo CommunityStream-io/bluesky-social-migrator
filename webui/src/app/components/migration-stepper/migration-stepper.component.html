@@ -1,0 +1,145 @@
+<div class="migration-stepper-container">
+  <!-- Header with progress -->
+  <mat-card class="stepper-header">
+    <div class="header-content">
+      <h1>Instagram to Bluesky Migration</h1>
+      <p class="subtitle">Migrate your Instagram content to Bluesky in 5 simple steps</p>
+      
+      <!-- Overall progress bar -->
+      <div class="overall-progress">
+        <div class="progress-label">
+          <span>Overall Progress</span>
+          <span class="progress-percentage">{{ getOverallProgress() | number:'1.0-0' }}%</span>
+        </div>
+        <mat-progress-bar 
+          [value]="getOverallProgress()" 
+          [color]="getOverallProgress() === 100 ? 'accent' : 'primary'">
+        </mat-progress-bar>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Main stepper -->
+  <mat-stepper 
+    #stepper 
+    [linear]="true" 
+    [selectedIndex]="currentStepIndex"
+    class="migration-stepper">
+    
+    <!-- Step 1: Content Upload -->
+    <mat-step 
+      [stepControl]="contentUploadForm" 
+      [completed]="getCurrentStep()?.completed">
+      <ng-template matStepLabel>
+        <div class="step-label">
+          <mat-icon>cloud_upload</mat-icon>
+          <span>Content Upload</span>
+        </div>
+      </ng-template>
+      <ng-template matStepContent>
+        <app-content-upload 
+          (stepCompleted)="onStepCompleted(0)">
+        </app-content-upload>
+      </ng-template>
+    </mat-step>
+
+    <!-- Step 2: Bluesky Authentication -->
+    <mat-step 
+      [stepControl]="blueskyAuthForm" 
+      [completed]="getCurrentStep()?.completed">
+      <ng-template matStepLabel>
+        <div class="step-label">
+          <mat-icon>account_circle</mat-icon>
+          <span>Bluesky Authentication</span>
+        </div>
+      </ng-template>
+      <ng-template matStepContent>
+        <app-bluesky-auth 
+          (stepCompleted)="onStepCompleted(1)">
+        </app-bluesky-auth>
+      </ng-template>
+    </mat-step>
+
+    <!-- Step 3: Migration Configuration -->
+    <mat-step 
+      [stepControl]="migrationConfigForm" 
+      [completed]="getCurrentStep()?.completed">
+      <ng-template matStepLabel>
+        <div class="step-label">
+          <mat-icon>settings</mat-icon>
+          <span>Migration Configuration</span>
+        </div>
+      </ng-template>
+      <ng-template matStepContent>
+        <app-migration-config 
+          (stepCompleted)="onStepCompleted(2)">
+        </app-migration-config>
+      </ng-template>
+    </mat-step>
+
+    <!-- Step 4: Migration Execution -->
+    <mat-step 
+      [stepControl]="migrationExecutionForm" 
+      [completed]="getCurrentStep()?.completed">
+      <ng-template matStepLabel>
+        <div class="step-label">
+          <mat-icon>sync</mat-icon>
+          <span>Migration Execution</span>
+        </div>
+      </ng-template>
+      <ng-template matStepContent>
+        <app-migration-execution 
+          (stepCompleted)="onStepCompleted(3)">
+        </app-migration-execution>
+      </ng-template>
+    </mat-step>
+
+    <!-- Step 5: Completion -->
+    <mat-step 
+      [completed]="getCurrentStep()?.completed">
+      <ng-template matStepLabel>
+        <div class="step-label">
+          <mat-icon>check_circle</mat-icon>
+          <span>Completion</span>
+        </div>
+      </ng-template>
+      <ng-template matStepContent>
+        <app-completion 
+          (stepCompleted)="onStepCompleted(4)">
+        </app-completion>
+      </ng-template>
+    </mat-step>
+  </mat-stepper>
+
+  <!-- Navigation buttons -->
+  <div class="stepper-navigation" *ngIf="currentStepIndex < 4">
+    <div class="navigation-buttons">
+      <button 
+        mat-button 
+        [disabled]="!canGoBack || isLoading"
+        (click)="previousStep()"
+        class="nav-button">
+        <mat-icon>arrow_back</mat-icon>
+        Previous
+      </button>
+      
+      <button 
+        mat-raised-button 
+        color="primary" 
+        [disabled]="!canProceed || isLoading"
+        (click)="nextStep()"
+        class="nav-button">
+        <span *ngIf="!isLoading">
+          {{ currentStepIndex === 3 ? 'Complete' : 'Next' }}
+          <mat-icon>arrow_forward</mat-icon>
+        </span>
+        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+      </button>
+    </div>
+    
+    <div class="step-info">
+      <span class="step-counter">Step {{ currentStepIndex + 1 }} of 5</span>
+      <span class="step-description">{{ getStepDescriptions()[currentStepIndex] }}</span>
+    </div>
+  </div>
+</div>

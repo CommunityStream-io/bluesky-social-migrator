@@ -1,0 +1,360 @@
+.migration-config-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.config-card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  
+  mat-card-header {
+    margin-bottom: 24px;
+    
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 500;
+      
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+    
+    mat-card-subtitle {
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.6);
+      margin-top: 8px;
+    }
+  }
+}
+
+.config-summary {
+  margin-bottom: 32px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #1976d2;
+  
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    
+    mat-icon {
+      color: #1976d2;
+    }
+  }
+  
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      
+      .label {
+        font-weight: 500;
+        color: #666;
+      }
+      
+      .value {
+        font-weight: 600;
+        color: #333;
+      }
+    }
+  }
+}
+
+.config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  
+  .form-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    
+    h4 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 20px 0;
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+      
+      mat-icon {
+        color: #1976d2;
+      }
+    }
+    
+    .form-row {
+      margin-bottom: 16px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .full-width {
+        width: 100%;
+      }
+    }
+    
+    .date-warning {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #fff3e0;
+      border-radius: 4px;
+      color: #f57c00;
+      font-size: 14px;
+      
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+  
+  .advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1976d2;
+    font-weight: 500;
+    
+    mat-icon {
+      transition: transform 0.3s ease;
+    }
+  }
+  
+  .advanced-options {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+    
+    button[type="submit"] {
+      padding: 12px 32px;
+      font-size: 16px;
+      min-width: 180px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+.option-content {
+  display: flex;
+  flex-direction: column;
+  
+  .option-label {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .option-description {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+  }
+}
+
+.post-preview {
+  margin-top: 32px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+  
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    
+    mat-icon {
+      color: #4caf50;
+    }
+  }
+  
+  .preview-stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 20px;
+    
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      color: #333;
+      
+      mat-icon {
+        color: #4caf50;
+      }
+    }
+  }
+  
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+    
+    .post-card {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      
+      .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        
+        .post-date {
+          font-size: 12px;
+          color: #666;
+        }
+        
+        .post-stats {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 12px;
+          color: #666;
+          
+          mat-icon {
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+          }
+        }
+      }
+      
+      .post-content {
+        margin-bottom: 12px;
+        
+        .post-caption {
+          margin: 0;
+          font-size: 14px;
+          color: #333;
+          line-height: 1.4;
+        }
+      }
+      
+      .post-media {
+        .media-count {
+          font-size: 12px;
+          color: #1976d2;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  
+  .preview-footer {
+    text-align: center;
+    
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+  }
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #e8f5e8;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+  margin-top: 24px;
+  
+  mat-icon {
+    color: #4caf50;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+  
+  h5 {
+    margin: 0;
+    color: #2e7d32;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .migration-config-container {
+    padding: 16px;
+  }
+  
+  .config-summary .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .post-preview .preview-stats {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .posts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 16px;
+    
+    button[type="submit"] {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .form-section {
+    padding: 16px;
+  }
+  
+  .post-preview {
+    padding: 16px;
+  }
+}

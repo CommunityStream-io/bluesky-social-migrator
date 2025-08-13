@@ -100,11 +100,20 @@ export class InstagramServiceMVP implements InstagramService {
   private generateSampleProcessedPosts(count: number): ProcessedPost[] {
     const posts: ProcessedPost[] = [];
     for (let i = 0; i < count; i++) {
+      const originalMedia = this.generateSampleMedia(Math.floor(Math.random() * 3) + 1);
+      const processedMedia = originalMedia.map(media => ({
+        id: `processed_${media.id}`,
+        originalMedia: media,
+        processedUrl: `https://via.placeholder.com/800x600?text=Processed+${media.id}`,
+        size: Math.floor(media.size * 0.8), // Simulate compression
+        type: media.type
+      }));
+      
       posts.push({
         id: `processed_${i + 1}`,
         originalPost: this.generateSamplePosts(1)[0],
         content: `Processed content for post ${i + 1}`,
-        media: this.generateSampleMedia(Math.floor(Math.random() * 3) + 1),
+        media: processedMedia,
         estimatedTime: Math.floor(Math.random() * 120) + 60 // 1-3 minutes
       });
     }
