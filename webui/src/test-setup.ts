@@ -1,10 +1,5 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import { TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-
-// Initialize Angular testing environment
-TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
 
 // Mock global objects that might not be available in test environment
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
@@ -34,3 +29,18 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
+
+// Mock FileReader for file upload tests
+global.FileReader = vi.fn().mockImplementation(() => ({
+  readAsText: vi.fn(),
+  readAsDataURL: vi.fn(),
+  readAsArrayBuffer: vi.fn(),
+  result: null,
+  onload: null,
+  onerror: null,
+  onloadend: null,
+})) as any;
+
+// Mock URL.createObjectURL
+global.URL.createObjectURL = vi.fn(() => 'mocked-url');
+global.URL.revokeObjectURL = vi.fn();

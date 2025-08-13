@@ -75,6 +75,22 @@ describe('MigrationStateService', () => {
       });
     });
 
+    it('should not advance beyond last step', () => {
+      // Complete all steps first
+      for (let i = 0; i < 5; i++) {
+        service.completeStep(i);
+      }
+      
+      // Go to last step
+      for (let i = 0; i < 5; i++) {
+        service.nextStep();
+      }
+      
+      service.state$.subscribe(state => {
+        expect(state.currentStep).toBe(4); // Should stay at last step
+      });
+    });
+
     it('should allow advancement beyond last step when steps are completed', () => {
       // Complete all steps first
       for (let i = 0; i < 5; i++) {

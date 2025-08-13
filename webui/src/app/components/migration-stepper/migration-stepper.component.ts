@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { MigrationStateService } from '../../services/migration-state.service';
@@ -34,6 +34,7 @@ import { CompletionComponent } from '../steps/completion/completion.component';
     MatProgressBarModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    ReactiveFormsModule,
     ContentUploadComponent,
     BlueskyAuthComponent,
     MigrationConfigComponent,

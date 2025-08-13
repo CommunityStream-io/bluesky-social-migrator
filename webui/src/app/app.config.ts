@@ -1,6 +1,5 @@
 import { ApplicationConfig, InjectionToken } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideZoneChangeDetection } from '@angular/core';
 
 import { BlueskyService } from './services/interfaces/bluesky-service.interface';
 import { InstagramService } from './services/interfaces/instagram-service.interface';
@@ -8,6 +7,7 @@ import { ProgressService } from './services/interfaces/progress-service.interfac
 import { BlueskyServiceMVP } from './services/bluesky/bluesky.service';
 import { InstagramServiceMVP } from './services/instagram/instagram.service';
 import { ProgressServiceMVP } from './services/progress/progress.service';
+import { MigrationStateService } from './services/migration-state.service';
 
 // Injection tokens for service interfaces
 export const BLUESKY_SERVICE = new InjectionToken<BlueskyService>('BlueskyService');
@@ -17,7 +17,7 @@ export const PROGRESS_SERVICE = new InjectionToken<ProgressService>('ProgressSer
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
-    provideZoneChangeDetection(),
+    MigrationStateService,
     {
       provide: BLUESKY_SERVICE,
       useClass: BlueskyServiceMVP

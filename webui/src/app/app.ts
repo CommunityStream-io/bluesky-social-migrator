@@ -7,6 +7,6 @@ import { MigrationStepperComponent } from './components/migration-stepper/migrat
   imports: [MigrationStepperComponent],
   template: '<app-migration-stepper></app-migration-stepper>'
 })
-export class App {
+export class AppComponent {
   protected readonly title = 'Bluesky Social Migrator';
 }
