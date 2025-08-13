@@ -120,6 +120,8 @@ User Input → Validation → State Management → API Integration → Progress 
   & Selection   Analysis    Management     & Bluesky    Updates       Summary
 ```
 
+**Note**: The Instagram and Bluesky API integration leverages the existing migration tools architecture. See [Migration Tools Architecture](MIGRATION_TOOLS_ARCHITECTURE.md) for detailed implementation details.
+
 ### Data Flow Details
 
 1. **User Input**: File uploads, form submissions, configuration selections
@@ -189,11 +191,13 @@ interface MigrationStep {
 - Manages Bluesky API interactions
 - Handles authentication and token management
 - Provides content posting and management
+- **Integration**: Wraps the BlueskyClient from migration tools (see [Migration Tools Architecture](MIGRATION_TOOLS_ARCHITECTURE.md))
 
 #### InstagramService
 - Handles Instagram data processing
 - Parses exported Instagram data
 - Extracts media and metadata
+- **Integration**: Wraps the Instagram to Bluesky migration tools (see [Migration Tools Architecture](MIGRATION_TOOLS_ARCHITECTURE.md))
 
 #### ProgressService
 - Tracks migration progress and status
