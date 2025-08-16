@@ -18,6 +18,7 @@ import { MigrationConfigComponent } from '../steps/migration-config/migration-co
 import { MigrationExecutionComponent } from '../steps/migration-execution/migration-execution.component';
 import { CompletionComponent } from '../steps/completion/completion.component';
 import { PerformanceMonitorComponent } from '../performance-monitor/performance-monitor.component';
+import { tap } from 'rxjs';
 
 /**
  * Main component for the migration workflow
@@ -100,15 +101,17 @@ export class MigrationStepperComponent implements OnInit {
 
     // Subscribe to overall state for initial load
     this.migrationStateService.state$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(state => {
+      .pipe(
+        tap(state => {
         if (!this.migrationState || this.migrationState.currentStep !== state.currentStep) {
           this.migrationState = state;
           this.currentStepIndex = state.currentStep;
           this.updateNavigationState();
           this.cdr.markForCheck();
         }
-      });
+      }),
+        takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
   /** Updates navigation state based on current step and completion status */

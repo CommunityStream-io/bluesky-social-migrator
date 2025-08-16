@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -8,13 +8,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { Subscription } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
 
 import { InstagramService } from '../../../services/interfaces/instagram-service.interface';
 import { MigrationStateService } from '../../../services/migration-state.service';
-import { ValidationResult, InstagramPost, Media, MigrationState } from '../../../models/migration-state.interface';
-import { BLUESKY_SERVICE, INSTAGRAM_SERVICE, PROGRESS_SERVICE } from '../../../app.config';
+import { ValidationResult, MigrationState } from '../../../models/migration-state.interface';
+import { INSTAGRAM_SERVICE } from '../../../app.config';
 import { Inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Step 1: Content Upload Component
@@ -40,28 +41,28 @@ import { Inject } from '@angular/core';
   templateUrl: './content-upload.component.html',
   styleUrls: ['./content-upload.component.scss']
 })
-export class ContentUploadComponent implements OnInit, OnDestroy {
+export class ContentUploadComponent implements OnInit {
   /** Currently selected files for upload */
   selectedFiles: File[] = [];
-  
+
   /** Whether files are currently being processed */
   isProcessing = false;
-  
+
   /** Upload progress percentage */
   uploadProgress = 0;
-  
+
   /** Validation results from Instagram service */
   validationResult: ValidationResult | null = null;
-  
+
   /** Whether the step is completed and can proceed */
   isStepCompleted = false;
-  
+
   /** Error messages to display */
   errors: string[] = [];
-  
+
   /** Warning messages to display */
   warnings: string[] = [];
-  
+
   /** Subscription to state changes */
   private stateSubscription: Subscription | null = null;
 
@@ -70,22 +71,17 @@ export class ContentUploadComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject(INSTAGRAM_SERVICE) private instagramService: InstagramService,
-    private migrationStateService: MigrationStateService
-  ) {}
+    private migrationStateService: MigrationStateService,
+    private destroyRef: DestroyRef
+  ) { }
 
   ngOnInit(): void {
-    this.stateSubscription = this.migrationStateService.state$.subscribe((state: MigrationState) => {
+    this.stateSubscription = this.migrationStateService.state$.pipe(takeUntilDestroyed(this.destroyRef), tap((state: MigrationState) => {
       const currentStep = state.steps[0]; // Content upload is step 0
       this.isStepCompleted = currentStep.completed;
       this.errors = currentStep.errors;
       this.warnings = currentStep.warnings;
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.stateSubscription) {
-      this.stateSubscription.unsubscribe();
-    }
+    })).subscribe();
   }
 
   /**
@@ -151,10 +147,10 @@ export class ContentUploadComponent implements OnInit, OnDestroy {
     try {
       // Simulate upload progress
       await this.simulateUploadProgress();
-      
+
       // Validate files with Instagram service
       this.validationResult = await this.instagramService.validateExportData(this.selectedFiles);
-      
+
       if (this.validationResult.isValid) {
         this.completeStep();
       } else {
@@ -175,7 +171,7 @@ export class ContentUploadComponent implements OnInit, OnDestroy {
   private completeStep(): void {
     this.isStepCompleted = true;
     this.migrationStateService.completeStep(0);
-    
+
     // Update step data with validation results
     if (this.validationResult) {
       this.migrationStateService.updateStepData(0, {
@@ -184,7 +180,7 @@ export class ContentUploadComponent implements OnInit, OnDestroy {
         validationResult: this.validationResult
       });
     }
-    
+
     // Emit step completed event
     this.stepCompleted.emit();
   }

@@ -1,25 +1,33 @@
-import { test, expect } from '@playwright/test';
 import { MigrationStateService } from './migration-state.service';
+import { SentryService } from './sentry.service';
 
-test.describe('MigrationStateService', () => {
+// Mock SentryService
+const mockSentryService = {
+  addBreadcrumb: jasmine.createSpy('addBreadcrumb'),
+  captureError: jasmine.createSpy('captureError'),
+  captureStepCompletion: jasmine.createSpy('captureStepCompletion'),
+  isSentryEnabled: jasmine.createSpy('isSentryEnabled').and.returnValue(true),
+};
+
+describe('MigrationStateService', () => {
   let service: MigrationStateService;
 
-  test.beforeEach(async () => {
-    service = new MigrationStateService();
+  beforeEach(() => {
+    service = new MigrationStateService(mockSentryService as any);
   });
 
-  test('should be created', async () => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  test('should have initial state', async () => {
+  it('should have initial state', () => {
     const initialState = service.getCurrentState();
     expect(initialState).toBeTruthy();
     expect(initialState.currentStep).toBe(0);
-    expect(initialState.steps).toHaveLength(5);
+    expect(initialState.steps.length).toBe(5);
   });
 
-  test('should advance to next step when current step is completed', async () => {
+  it('should advance to next step when current step is completed', () => {
     // Complete the first step
     service.completeStep(0);
     
@@ -30,7 +38,7 @@ test.describe('MigrationStateService', () => {
     expect(state.currentStep).toBe(1);
   });
 
-  test('should not advance when current step is not completed', async () => {
+  it('should not advance when current step is not completed', () => {
     // Try to advance without completing current step
     service.nextStep();
     
@@ -38,7 +46,7 @@ test.describe('MigrationStateService', () => {
     expect(state.currentStep).toBe(0);
   });
 
-  test('should not advance beyond last step', async () => {
+  it('should not advance beyond last step', () => {
     // Complete all steps
     for (let i = 0; i < 5; i++) {
       service.completeStep(i);
@@ -52,7 +60,7 @@ test.describe('MigrationStateService', () => {
     expect(state.currentStep).toBe(1);
   });
 
-  test('should go back to previous step', async () => {
+  it('should go back to previous step', () => {
     // Complete first step and advance
     service.completeStep(0);
     service.nextStep();
@@ -64,7 +72,7 @@ test.describe('MigrationStateService', () => {
     expect(state.currentStep).toBe(0);
   });
 
-  test('should not go back before first step', async () => {
+  it('should not go back before first step', () => {
     // Try to go back from first step
     service.previousStep();
     
@@ -72,14 +80,14 @@ test.describe('MigrationStateService', () => {
     expect(state.currentStep).toBe(0);
   });
 
-  test('should complete a step', async () => {
+  it('should complete a step', () => {
     service.completeStep(0);
     
     const state = service.getCurrentState();
     expect(state.steps[0].completed).toBe(true);
   });
 
-  test('should update step data', async () => {
+  it('should update step data', () => {
     const stepData = {
       id: 'content-upload',
       completed: false,
@@ -98,28 +106,28 @@ test.describe('MigrationStateService', () => {
     expect(state.steps[0].completed).toBe(stepData.completed);
   });
 
-  test('should update step progress', async () => {
+  it('should update step progress', () => {
     service.updateStepProgress(0, 50);
     
     const state = service.getCurrentState();
     expect(state.steps[0].progress).toBe(50);
   });
 
-  test('should add step error', async () => {
+  it('should add step error', () => {
     service.addStepError(0, 'Test error');
     
     const state = service.getCurrentState();
     expect(state.steps[0].errors).toContain('Test error');
   });
 
-  test('should add step warning', async () => {
+  it('should add step warning', () => {
     service.addStepWarning(0, 'Test warning');
     
     const state = service.getCurrentState();
     expect(state.steps[0].warnings).toContain('Test warning');
   });
 
-  test('should reset state to initial values', async () => {
+  it('should reset state to initial values', () => {
     // Make some changes
     service.completeStep(0);
     service.nextStep();
@@ -132,7 +140,7 @@ test.describe('MigrationStateService', () => {
     expect(state.steps[0].completed).toBe(false);
   });
 
-  test('should maintain state across multiple operations', async () => {
+  it('should maintain state across multiple operations', () => {
     // Complete first step
     service.completeStep(0);
     expect(service.getCurrentState().steps[0].completed).toBe(true);
@@ -146,7 +154,7 @@ test.describe('MigrationStateService', () => {
     expect(service.getCurrentState().steps[1].completed).toBe(true);
   });
 
-  test('should get current state', async () => {
+  it('should get current state', () => {
     const state = service.getCurrentState();
     expect(state).toBeTruthy();
     expect(typeof state).toBe('object');

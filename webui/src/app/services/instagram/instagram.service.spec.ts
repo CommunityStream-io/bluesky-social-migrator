@@ -1,19 +1,19 @@
-import { test, expect } from '@playwright/test';
+import { TestBed } from '@angular/core/testing';
 import { InstagramServiceMVP } from './instagram.service';
 import { InstagramPost, ProcessedPost } from '../../models/migration-state.interface';
 
-test.describe('InstagramService', () => {
+describe('InstagramService', () => {
   let service: InstagramServiceMVP;
 
-  test.beforeEach(async () => {
+  beforeEach(() => {
     service = new InstagramServiceMVP();
   });
 
-  test('should be created', async () => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  test('should validate export data successfully', async () => {
+  it('should validate export data successfully', async () => {
     const mockFiles = [
       new File(['mock content'], 'posts.json', { type: 'application/json' }),
       new File(['mock content'], 'media.zip', { type: 'application/zip' })
@@ -30,7 +30,7 @@ test.describe('InstagramService', () => {
     expect(result.errors).toBeTruthy();
   });
 
-  test('should process Instagram data successfully', async () => {
+  it('should process Instagram data successfully', async () => {
     const mockFiles = [
       new File(['mock content'], 'posts.json', { type: 'application/json' })
     ];
@@ -44,7 +44,7 @@ test.describe('InstagramService', () => {
     expect(result[0].media).toBeTruthy();
   });
 
-  test('should estimate migration time correctly', async () => {
+  it('should estimate migration time correctly', async () => {
     const mockPosts: ProcessedPost[] = [
       {
         id: 'post1',
@@ -68,7 +68,7 @@ test.describe('InstagramService', () => {
     expect(result).toContain('0h 2m'); // 1 post * 2 minutes = 2 minutes
   });
 
-  test('should filter posts by date range', async () => {
+  it('should filter posts by date range', async () => {
     const mockPosts: InstagramPost[] = [
       {
         id: 'post1',
@@ -98,7 +98,7 @@ test.describe('InstagramService', () => {
     expect(result[0].caption).toBe('New post');
   });
 
-  test('should validate media files successfully', async () => {
+  it('should validate media files successfully', async () => {
     const mockFiles = [
       new File(['mock content'], 'image1.jpg', { type: 'image/jpeg' }),
       new File(['mock content'], 'video1.mp4', { type: 'video/mp4' }),
@@ -112,7 +112,7 @@ test.describe('InstagramService', () => {
     expect(result.invalid[0]).toContain('Invalid file: empty.txt');
   });
 
-  test('should handle empty file arrays', async () => {
+  it('should handle empty file arrays', async () => {
     const emptyFiles: File[] = [];
 
     const validationResult = await service.validateExportData(emptyFiles);
@@ -125,7 +125,7 @@ test.describe('InstagramService', () => {
     expect(mediaValidationResult.invalid.length).toBe(0);
   });
 
-  test('should generate realistic sample data', async () => {
+  it('should generate realistic sample data', async () => {
     const mockFiles = [
       new File(['mock content'], 'posts.json', { type: 'application/json' })
     ];
@@ -148,7 +148,7 @@ test.describe('InstagramService', () => {
     expect(processingResult[0].estimatedTime).toBeGreaterThan(0);
   });
 
-  test('should handle timing for validation operations', async () => {
+  it('should handle timing for validation operations', async () => {
     const mockFiles = [
       new File(['mock content'], 'posts.json', { type: 'application/json' })
     ];

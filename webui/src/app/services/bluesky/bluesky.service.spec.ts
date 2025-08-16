@@ -1,30 +1,30 @@
-import { test, expect } from '@playwright/test';
+import { TestBed } from '@angular/core/testing';
 import { BlueskyServiceMVP } from './bluesky.service';
 
-test.describe('BlueskyService', () => {
+describe('BlueskyService', () => {
   let service: BlueskyServiceMVP;
 
-  test.beforeEach(async () => {
+  beforeEach(() => {
     service = new BlueskyServiceMVP();
   });
 
-  test('should be created', async () => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  test('should authenticate with valid credentials', async () => {
+  it('should authenticate with valid credentials', async () => {
     const result = await service.authenticate('test.bsky.social', 'testpassword');
     
     expect(result).toBe(true);
   });
 
-  test('should fail authentication with invalid credentials', async () => {
+  it('should fail authentication with invalid credentials', async () => {
     const result = await service.authenticate('', '');
     
     expect(result).toBe(false);
   });
 
-  test('should create post successfully', async () => {
+  it('should create post successfully', async () => {
     const content = 'Test post from Instagram';
     const media: any[] = [];
 
@@ -34,7 +34,7 @@ test.describe('BlueskyService', () => {
     expect(result).toContain('https://bsky.app/profile/demo/post/');
   });
 
-  test('should create post with media', async () => {
+  it('should create post with media', async () => {
     const content = 'Test post with media';
     const media = [
       { id: 'media1', type: 'image', url: 'https://example.com/test.jpg' }
@@ -46,14 +46,14 @@ test.describe('BlueskyService', () => {
     expect(result).toContain('https://bsky.app/profile/demo/post/');
   });
 
-  test('should test connection successfully', async () => {
+  it('should test connection successfully', async () => {
     const result = await service.testConnection();
     
     // The MVP service has a 90% success rate, so this should usually pass
     expect(typeof result).toBe('boolean');
   });
 
-  test('should get account information', async () => {
+  it('should get account information', async () => {
     const accountInfo = await service.getAccountInfo();
     
     expect(accountInfo).toBeTruthy();
@@ -64,7 +64,7 @@ test.describe('BlueskyService', () => {
     expect(accountInfo.following).toBe(567);
   });
 
-  test('should validate credentials format', async () => {
+  it('should validate credentials format', async () => {
     const validResult = await service.validateCredentials('test.bsky.social', 'testpassword');
     const invalidResult = await service.validateCredentials('', '');
     
@@ -72,7 +72,7 @@ test.describe('BlueskyService', () => {
     expect(invalidResult).toBe(false);
   });
 
-  test('should handle authentication timing', async () => {
+  it('should handle authentication timing', async () => {
     const startTime = Date.now();
     await service.authenticate('test.bsky.social', 'testpassword');
     const endTime = Date.now();
@@ -81,7 +81,7 @@ test.describe('BlueskyService', () => {
     expect(endTime - startTime).toBeGreaterThanOrEqual(1000);
   });
 
-  test('should handle post creation timing', async () => {
+  it('should handle post creation timing', async () => {
     const startTime = Date.now();
     await service.createPost('Test content', []);
     const endTime = Date.now();
