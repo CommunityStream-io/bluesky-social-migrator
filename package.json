@@ -4,7 +4,7 @@
   "description": "Web app for migrating instragram to bsky without being technical",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cd webui && ng test",
     "start": "cd webui && ng serve"
   },
   "repository": {
