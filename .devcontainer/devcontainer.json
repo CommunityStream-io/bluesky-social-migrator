@@ -2,7 +2,7 @@
 	"image": "mcr.microsoft.com/devcontainers/universal:2",
 	"features": {
 	"ghcr.io/devcontainers-extra/features/angular-cli:2": {},
-	"ghcr.io/devcontainers/features/google-chrome:1": {}
+	"ghcr.io/kreemer/features/chrometesting:1": {}
 	},
 	"postStartCommand": "git submodule update --init --recursive && cd webui/ && npm install",
 	"customizations": {
