@@ -8,6 +8,8 @@ Huge shoutout to the Instragram to Bluesky maintainors that allows this project 
 
 ## Project structure
 
+> AngularCLI is installed locally at the root of the project allowing for many versions to be ran on the machine.
+
 ```
 bluesky-social-migrator/
 ├── .git/                          # Git repository

@@ -8,6 +8,8 @@ import { BlueskyServiceMVP } from './services/bluesky/bluesky.service';
 import { InstagramServiceMVP } from './services/instagram/instagram.service';
 import { ProgressServiceMVP } from './services/progress/progress.service';
 import { MigrationStateService } from './services/migration-state.service';
+import { PerformanceMonitorService } from './services/performance-monitor.service';
+import { SentryService } from './services/sentry.service';
 
 // Injection tokens for service interfaces
 export const BLUESKY_SERVICE = new InjectionToken<BlueskyService>('BlueskyService');
@@ -18,6 +20,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
     MigrationStateService,
+    PerformanceMonitorService,
+    SentryService,
     {
       provide: BLUESKY_SERVICE,
       useClass: BlueskyServiceMVP

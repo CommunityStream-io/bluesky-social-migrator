@@ -83,10 +83,28 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular-devkit/build-angular:web-test-runner",
           "options": {
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/styles.scss"
+            ]
+          }
+        },
+        "test-web": {
+          "builder": "@angular-devkit/build-angular:web-test-runner",
+          "options": {
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "polyfills": ["zone.js", "zone.js/testing"],
             "assets": [
               {
                 "glob": "**/*",

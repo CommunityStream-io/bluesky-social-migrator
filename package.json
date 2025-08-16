@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/CommunityStream-io/bluesky-social-migrator#readme",
   "dependencies": {
-    "@angular/cli": "^20.1.5"
+    "@angular/cli": "^20.1.5",
+    "@sentry/angular": "^10.5.0"
   }
 }

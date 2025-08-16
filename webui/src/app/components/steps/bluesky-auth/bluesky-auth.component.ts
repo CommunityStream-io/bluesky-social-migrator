@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -11,10 +11,11 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatListModule } from '@angular/material/list';
-import { Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { BlueskyService } from '../../../services/interfaces/bluesky-service.interface';
 import { MigrationStateService } from '../../../services/migration-state.service';
+import { SentryService } from '../../../services/sentry.service';
 import { BLUESKY_SERVICE } from '../../../app.config';
 import { Inject } from '@angular/core';
 import { MigrationState } from '../../../models/migration-state.interface';
@@ -25,6 +26,8 @@ import { MigrationState } from '../../../models/migration-state.interface';
  * Handles user authentication with Bluesky, including login form,
  * credential validation, and account information display.
  * Users must authenticate before proceeding to migration configuration.
+ * 
+ * @description Optimized for memory efficiency and performance, integrated with Sentry
  */
 @Component({
   selector: 'app-bluesky-auth',
@@ -44,9 +47,10 @@ import { MigrationState } from '../../../models/migration-state.interface';
     MatListModule
   ],
   templateUrl: './bluesky-auth.component.html',
-  styleUrls: ['./bluesky-auth.component.scss']
+  styleUrls: ['./bluesky-auth.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BlueskyAuthComponent implements OnInit, OnDestroy {
+export class BlueskyAuthComponent implements OnInit {
   /** Authentication form group */
   authForm: FormGroup;
   
@@ -76,16 +80,21 @@ export class BlueskyAuthComponent implements OnInit, OnDestroy {
     isErrorState: (control: any) => control && control.invalid && (control.dirty || control.touched)
   };
   
-  /** Subscription to state changes */
-  private stateSubscription: Subscription | null = null;
-
   /** Event emitted when the step is completed */
   @Output() stepCompleted = new EventEmitter<void>();
+  
+  /** Destroy reference for automatic cleanup */
+  private destroyRef = inject(DestroyRef);
+  
+  /** Authentication start time for performance tracking */
+  private authStartTime: number = 0;
 
   constructor(
     @Inject(BLUESKY_SERVICE) private blueskyService: BlueskyService,
     private migrationStateService: MigrationStateService,
-    private fb: FormBuilder
+    private sentryService: SentryService,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {
     this.authForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -95,23 +104,42 @@ export class BlueskyAuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.stateSubscription = this.migrationStateService.state$.subscribe((state: MigrationState) => {
-      const currentStep = state.steps[1]; // Bluesky auth is step 1
-      this.isStepCompleted = currentStep.completed;
-      this.errors = currentStep.errors;
-      
-      // Check if already authenticated
-      if (state.blueskyClient) {
-        this.isAuthenticated = true;
-        this.accountInfo = state.blueskyClient;
-      }
+    // Add breadcrumb for component initialization
+    this.sentryService.addBreadcrumb('component', 'Bluesky auth component initialized', {
+      timestamp: new Date().toISOString(),
+      step: 'bluesky-auth',
     });
-  }
 
-  ngOnDestroy(): void {
-    if (this.stateSubscription) {
-      this.stateSubscription.unsubscribe();
-    }
+    // Subscribe to step completion status only
+    this.migrationStateService.stepCompletion$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(stepCompletion => {
+        const currentStep = stepCompletion[1]; // Bluesky auth is step 1
+        if (this.isStepCompleted !== currentStep) {
+          this.isStepCompleted = currentStep;
+          this.cdr.markForCheck();
+        }
+      });
+
+    // Subscribe to current step data only when needed
+    this.migrationStateService.state$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((state: MigrationState) => {
+        const currentStep = state.steps[1]; // Bluesky auth is step 1
+        
+        // Only update if errors actually changed
+        if (JSON.stringify(this.errors) !== JSON.stringify(currentStep.errors)) {
+          this.errors = currentStep.errors;
+          this.cdr.markForCheck();
+        }
+        
+        // Check if already authenticated
+        if (state.blueskyClient && !this.isAuthenticated) {
+          this.isAuthenticated = true;
+          this.accountInfo = state.blueskyClient;
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   /**
@@ -122,6 +150,19 @@ export class BlueskyAuthComponent implements OnInit, OnDestroy {
 
     this.isAuthenticating = true;
     this.errors = [];
+    this.authStartTime = Date.now();
+    this.cdr.markForCheck();
+
+    // Add breadcrumb for authentication attempt
+    this.sentryService.addBreadcrumb('authentication', 'Bluesky authentication attempted', {
+      username: this.authForm.value.username,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Set user context for tracking
+    this.sentryService.setUser({
+      username: this.authForm.value.username,
+    });
 
     try {
       const { username, password } = this.authForm.value;
@@ -133,13 +174,20 @@ export class BlueskyAuthComponent implements OnInit, OnDestroy {
         this.isAuthenticated = true;
         await this.loadAccountInfo();
         this.completeStep();
+        
+        // Track successful authentication
+        this.trackAuthenticationSuccess();
       } else {
         this.errors = ['Authentication failed. Please check your credentials.'];
+        this.trackAuthenticationFailure('Invalid credentials');
       }
     } catch (error) {
-      this.errors = [`Authentication error: ${error}`];
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.errors = [`Authentication error: ${errorMessage}`];
+      this.trackAuthenticationFailure(errorMessage);
     } finally {
       this.isAuthenticating = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -149,9 +197,27 @@ export class BlueskyAuthComponent implements OnInit, OnDestroy {
   private async loadAccountInfo(): Promise<void> {
     try {
       this.accountInfo = await this.blueskyService.getAccountInfo();
+      
+      // Add breadcrumb for account info loaded
+      this.sentryService.addBreadcrumb('authentication', 'Account information loaded', {
+        username: this.accountInfo.username,
+        hasDisplayName: !!this.accountInfo.displayName,
+        timestamp: new Date().toISOString(),
+      });
+      
+      this.cdr.markForCheck();
     } catch (error) {
       console.warn('Failed to load account info:', error);
       this.accountInfo = { username: this.authForm.value.username };
+      
+      // Capture account info loading error
+      this.sentryService.captureError(error instanceof Error ? error : new Error(String(error)), {
+        errorType: 'account-info-loading',
+        username: this.authForm.value.username,
+        timestamp: new Date().toISOString(),
+      });
+      
+      this.cdr.markForCheck();
     }
   }
 
@@ -160,7 +226,6 @@ export class BlueskyAuthComponent implements OnInit, OnDestroy {
    */
   private completeStep(): void {
     this.isStepCompleted = true;
-    this.migrationStateService.completeStep(1);
     
     // Update step data with account information
     this.migrationStateService.updateStepData(1, {
@@ -168,14 +233,25 @@ export class BlueskyAuthComponent implements OnInit, OnDestroy {
       username: this.authForm.value.username
     });
     
+    // Mark step as completed
+    this.migrationStateService.completeStep(1);
+    
     // Emit step completed event
     this.stepCompleted.emit();
+    
+    this.cdr.markForCheck();
   }
 
   /**
    * Logs out the current user
    */
   logout(): void {
+    // Add breadcrumb for logout
+    this.sentryService.addBreadcrumb('authentication', 'User logged out', {
+      username: this.authForm.value.username,
+      timestamp: new Date().toISOString(),
+    });
+
     this.isAuthenticated = false;
     this.isStepCompleted = false;
     this.accountInfo = null;
@@ -184,6 +260,67 @@ export class BlueskyAuthComponent implements OnInit, OnDestroy {
     // Reset step completion
     this.migrationStateService.updateStepData(1, null);
     this.migrationStateService.addStepError(1, 'User logged out');
+    
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Tracks successful authentication
+   */
+  private trackAuthenticationSuccess(): void {
+    const duration = Date.now() - this.authStartTime;
+    
+    // Add breadcrumb for successful authentication
+    this.sentryService.addBreadcrumb('authentication', 'Bluesky authentication successful', {
+      username: this.authForm.value.username,
+      duration,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Set authentication context
+    this.sentryService.setContext('authentication', {
+      provider: 'bluesky',
+      username: this.authForm.value.username,
+      duration,
+      success: true,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Set authentication tags
+    this.sentryService.setTag('auth_provider', 'bluesky');
+    this.sentryService.setTag('auth_success', 'true');
+    this.sentryService.setTag('auth_duration', duration.toString());
+  }
+
+  /**
+   * Tracks authentication failure
+   */
+  private trackAuthenticationFailure(errorMessage: string): void {
+    const duration = Date.now() - this.authStartTime;
+    
+    // Add breadcrumb for authentication failure
+    this.sentryService.addBreadcrumb('authentication', 'Bluesky authentication failed', {
+      username: this.authForm.value.username,
+      error: errorMessage,
+      duration,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Set authentication context
+    this.sentryService.setContext('authentication', {
+      provider: 'bluesky',
+      username: this.authForm.value.username,
+      duration,
+      success: false,
+      error: errorMessage,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Set authentication tags
+    this.sentryService.setTag('auth_provider', 'bluesky');
+    this.sentryService.setTag('auth_success', 'false');
+    this.sentryService.setTag('auth_duration', duration.toString());
+    this.sentryService.setTag('auth_error', errorMessage);
   }
 
   /**
@@ -191,6 +328,12 @@ export class BlueskyAuthComponent implements OnInit, OnDestroy {
    */
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+    
+    // Add breadcrumb for password visibility toggle
+    this.sentryService.addBreadcrumb('ui', 'Password visibility toggled', {
+      visible: this.showPassword,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   /**

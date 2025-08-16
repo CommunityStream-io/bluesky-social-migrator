@@ -5,19 +5,34 @@
       <h1>Instagram to Bluesky Migration</h1>
       <p class="subtitle">Migrate your Instagram content to Bluesky in 5 simple steps</p>
       
-      <!-- Overall progress bar -->
-      <div class="overall-progress">
-        <div class="progress-label">
-          <span>Overall Progress</span>
-          <span class="progress-percentage">{{ getOverallProgress() | number:'1.0-0' }}%</span>
-        </div>
-        <mat-progress-bar 
-          [value]="getOverallProgress()" 
-          [color]="getOverallProgress() === 100 ? 'accent' : 'primary'">
-        </mat-progress-bar>
-      </div>
+             <!-- Overall progress bar -->
+       <div class="overall-progress">
+         <div class="progress-label">
+           <span>Overall Progress</span>
+           <span class="progress-percentage">{{ getOverallProgress() | number:'1.0-0' }}%</span>
+         </div>
+         <mat-progress-bar 
+           [value]="getOverallProgress()" 
+           [color]="getOverallProgress() === 100 ? 'accent' : 'primary'">
+         </mat-progress-bar>
+       </div>
+       
+       <!-- Feedback button -->
+       <div class="feedback-section">
+         <button 
+           mat-button 
+           color="accent"
+           (click)="openFeedback()"
+           class="feedback-button">
+           <mat-icon>feedback</mat-icon>
+           Send Feedback
+         </button>
+       </div>
     </div>
   </mat-card>
+
+  <!-- Performance Monitor (Development Only) -->
+  <app-performance-monitor *ngIf="showPerformanceMonitor"></app-performance-monitor>
 
   <!-- Main stepper -->
   <mat-stepper 
@@ -28,7 +43,6 @@
     
     <!-- Step 1: Content Upload -->
     <mat-step 
-      [stepControl]="contentUploadForm" 
       [completed]="getCurrentStep()?.completed">
       <ng-template matStepLabel>
         <div class="step-label">
@@ -45,7 +59,6 @@
 
     <!-- Step 2: Bluesky Authentication -->
     <mat-step 
-      [stepControl]="blueskyAuthForm" 
       [completed]="getCurrentStep()?.completed">
       <ng-template matStepLabel>
         <div class="step-label">
@@ -62,7 +75,6 @@
 
     <!-- Step 3: Migration Configuration -->
     <mat-step 
-      [stepControl]="migrationConfigForm" 
       [completed]="getCurrentStep()?.completed">
       <ng-template matStepLabel>
         <div class="step-label">
@@ -79,7 +91,6 @@
 
     <!-- Step 4: Migration Execution -->
     <mat-step 
-      [stepControl]="migrationExecutionForm" 
       [completed]="getCurrentStep()?.completed">
       <ng-template matStepLabel>
         <div class="step-label">
@@ -112,34 +123,36 @@
   </mat-stepper>
 
   <!-- Navigation buttons -->
-  <div class="stepper-navigation" *ngIf="currentStepIndex < 4">
-    <div class="navigation-buttons">
-      <button 
-        mat-button 
-        [disabled]="!canGoBack || isLoading"
-        (click)="previousStep()"
-        class="nav-button">
-        <mat-icon>arrow_back</mat-icon>
-        Previous
-      </button>
-      
-      <button 
-        mat-raised-button 
-        color="primary" 
-        [disabled]="!canProceed || isLoading"
-        (click)="nextStep()"
-        class="nav-button">
-        <span *ngIf="!isLoading">
-          {{ currentStepIndex === 3 ? 'Complete' : 'Next' }}
-          <mat-icon>arrow_forward</mat-icon>
-        </span>
-        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
-      </button>
-    </div>
+  <div class="stepper-navigation">
+    <button 
+      mat-button 
+      (click)="previousStep()" 
+      [disabled]="!canGoBack || isLoading"
+      class="nav-button">
+      <mat-icon>arrow_back</mat-icon>
+      Previous
+    </button>
     
-    <div class="step-info">
-      <span class="step-counter">Step {{ currentStepIndex + 1 }} of 5</span>
-      <span class="step-description">{{ getStepDescriptions()[currentStepIndex] }}</span>
-    </div>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="nextStep()" 
+      [disabled]="!canProceed || isLoading"
+      class="nav-button">
+      <mat-icon *ngIf="!isLoading">arrow_forward</mat-icon>
+      <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+      {{ isLoading ? 'Loading...' : 'Next' }}
+    </button>
+  </div>
+
+  <!-- Performance Toggle Button (Development Only) -->
+  <div class="performance-toggle">
+    <button 
+      mat-button 
+      (click)="togglePerformanceMonitor()"
+      class="toggle-button">
+      <mat-icon>{{ showPerformanceMonitor ? 'visibility_off' : 'visibility' }}</mat-icon>
+      {{ showPerformanceMonitor ? 'Hide' : 'Show' }} Performance Monitor
+    </button>
   </div>
 </div>
